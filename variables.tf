@@ -13,6 +13,10 @@ variable "use_existing_vcn" {
   default = false
 }
 
+variable "pg_whitelisted_ip" {
+  default = ""
+}
+
 variable "postgresql_vcn" {
   default = ""
 }
@@ -30,12 +34,12 @@ variable "create_in_private_subnet" {
 }
 
 variable "create_drg_for_private_subnet" {
-  default = true
+  default = false
 }
 
 variable "release" {
   description = "Reference Architecture Release (OCI Architecture Center)"
-  default     = "1.4"
+  default     = "1.4.1"
 }
 
 variable "ssh_public_key" {

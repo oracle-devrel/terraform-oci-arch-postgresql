@@ -99,6 +99,16 @@
         visible: true
         default: false
 
+      pg_whitelisted_ip: 
+        type: string
+        visible: 
+           not:
+             - create_in_private_subnet
+        required: false
+        title: "Whitelisted IP"
+        description: "Choose whitelisted IP in public scenario."
+        default: ""
+
       postgresql_deploy_hotstandby1:
         type: boolean
         title: "Deploy first PostgreSQL HotStandby?"

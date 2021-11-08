@@ -8,6 +8,7 @@ data "template_file" "postgresql_install_binaries_sh" {
     pg_password       = var.postgresql_password
     pg_version_no_dot = replace(var.postgresql_version, ".", "")
     pg_version        = var.postgresql_version
+    pg_whitelisted_ip = var.pg_whitelisted_ip
   }
 }
 
