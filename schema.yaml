@@ -1,0 +1,537 @@
+## Copyright © 2021, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
+    title: "Create three-node deployment of a High Available PostgreSQL database on Oracle Cloud Infrastructure Compute instances."
+    stackDescription: "Deploy typical three-node deployment of a High Available PostgreSQL database on Oracle Cloud Infrastructure Compute instances."
+    schemaVersion: 1.1.0
+    version: "20190404"
+    locale: "en"
+
+    variableGroups:
+    - title: General Configuration
+      visible: false
+      variables:
+      - tenancy_ocid
+      - region
+      - release
+      - use_existing_vcn
+      - postgresql_vcn
+      - postgresql_subnet
+      
+    - title: Required Configuration  
+      variables:
+      - compartment_ocid
+      - availablity_domain_name
+      - postgresql_version
+      - postgresql_password
+      - postgresql_deploy_hotstandby1
+      - postgresql_deploy_hotstandby2
+      - create_in_private_subnet
+      - show_advanced
+
+    - title: Network Optional Configuration
+      visible: 
+          and:
+            - show_advanced
+      variables:
+      - postgresql_vcn_cidr
+      - postgresql_subnet_cidr
+      - create_drg_for_private_subnet
+
+    - title: Compute, Storage & Backup Optional Configuration
+      visible: 
+          and:
+            - show_advanced
+      variables:
+      - ssh_public_key
+      - instance_os
+      - linux_os_version
+      - add_iscsi_volume
+      - boot_volume_backup_policy_enabled
+      - boot_volume_backup_policy_level
+      - boot_volume_initial_backup
+      - iscsi_volume_size_in_gbs
+      - block_volume_backup_policy_enabled
+      - block_volume_backup_policy_level
+      - block_volume_initial_backup
+
+    - title: PostgreSQL Master Optional Configuration
+      visible: 
+          and:
+            - show_advanced
+      variables:
+      - postgresql_master_fd
+      - postgresql_instance_shape
+      - postgresql_instance_flex_shape_ocpus
+      - postgresql_instance_flex_shape_memory
+      - postgresql_replicat_username
+
+    - title: PostgreSQL HotStandby1 Optional Configuration
+      visible: 
+          and:
+            - show_advanced 
+            - postgresql_deploy_hotstandby1
+      variables:
+      - postgresql_hotstandby1_ad
+      - postgresql_hotstandby1_fd
+      - postgresql_hotstandby1_shape
+      - postgresql_hotstandby1_flex_shape_ocpus
+      - postgresql_hotstandby1_flex_shape_memory
+
+    - title: PostgreSQL HotStandby2 Configuration
+      visible: 
+          and:
+            - show_advanced
+            - postgresql_deploy_hotstandby2 
+      variables:
+      - postgresql_hotstandby2_ad
+      - postgresql_hotstandby2_fd
+      - postgresql_hotstandby2_shape
+      - postgresql_hotstandby2_flex_shape_ocpus
+      - postgresql_hotstandby2_flex_shape_memory
+
+    variables:
+
+      show_advanced:
+        type: boolean
+        title: "Show advanced options?"
+        description: "Shows advanced options."
+        visible: true
+        default: false
+
+      postgresql_deploy_hotstandby1:
+        type: boolean
+        title: "Deploy first PostgreSQL HotStandby?"
+        description: "Check the box to deploy first PostgreSQL HotStandby."
+        visible: true
+        default: true
+
+      postgresql_deploy_hotstandby2:
+        type: boolean
+        title: "Deploy second PostgreSQL HotStandby?"
+        description: "Check the box to deploy second PostgreSQL HotStandby."
+        visible: true
+        default: true
+      
+      compartment_ocid:
+        type: oci:identity:compartment:id
+        required: true
+        visible: true
+        title: Compartment
+        description: "Compartment where you want to create the solution resources"
+
+      region:
+        type: oci:identity:region:name
+        required: true
+        visible: true
+        title: Region
+        description: "Region where you want to deploy the resources defined by this stack."
+
+      availablity_domain_name:
+        type: oci:identity:availabilitydomain:name
+        required: true
+        visible: true
+        title: "Availability Domain for master PostgreSQL"
+        description: "Availability Domain to be chosen for master PostgreSQL."
+        dependsOn:
+          compartmentId: ${compartment_ocid}
+
+      ssh_public_key:
+        type: oci:core:ssh:publickey
+        title: "Public SSH Key"
+        description: "Choose public SSH Key to be uploaded into compute instances."
+        required: false
+
+      postgresql_password:
+        type: password
+        required: true
+        visible: true
+        title: "PostgreSQL Password"
+        description: "The password must start with a letter, and it can contain letters (uppercase, lowercase), numbers, and the symbols _ $ #"        
+        minLength: 12
+        maxLength: 30
+        pattern: ^[A-Za-z][A-Za-z0-9_#\$]+$ 
+
+      postgresql_version:
+        type: enum
+        visible: true
+        required: true
+        title: "PostgreSQL Version"
+        description: "Choose PostgreSQL Version."
+        default: "13"
+        enum:
+          - "13"  
+          - "12"
+          - "11"
+          - "10"          
+          - "9.6" 
+
+      create_in_private_subnet:
+        type: boolean
+        visible: true
+        required: true
+        title: "Create in Private Subnet"
+        description: "Providing an option to create PostgreSQL VMs in private or public subnet (for private subnet OCI Bastion Service will be provisioned)."
+        default: true
+
+      # Optional Configuration  
+
+      add_iscsi_volume:
+        type: boolean
+        title: "Add iSCSI Volume to compute?"
+        description: "Check the box to add iSCSI Volume to compute instance."
+        visible: true
+        default: true
+
+      iscsi_volume_size_in_gbs:
+        type: number
+        title: "iSCSI Volume Size in GB"
+        description: "Choose the size of iSCSI volume attached to compute instance (default=100GB, min=50GB, max=32000GB)."
+        required: false
+        minimum: 50
+        maximum: 32000
+        multipleOf: 1
+        default: 100    
+        visible: 
+          and:
+            - add_iscsi_volume   
+
+      boot_volume_backup_policy_enabled:
+        type: boolean
+        title: "Enable Boot Volume Backup Policy"
+        description: "Check the box if you want to add Boot Volume Backup Policy."
+        visible: true
+        default: true
+
+      boot_volume_backup_policy_level:
+        type: enum
+        required: false
+        title: "Boot Volume Backup Policy"
+        description: "Choose the value for Boot Volume Backup Policy."
+        default: "gold"
+        enum:
+          - "gold"
+          - "silver"
+          - "bronze"
+        visible: 
+          and:
+            - boot_volume_backup_policy_enabled
+
+      boot_volume_initial_backup:
+        type: boolean
+        title: "Initial FULL backup of the Boot Volume"
+        description: "Check the box if you want to take initial FULL backup of the Boot Volume."
+        visible: true
+        default: true
+
+      block_volume_backup_policy_enabled:
+        type: boolean
+        title: "Enable iSCSI Block Volume Backup Policy"
+        description: "Check the box if you want to add iSCSI Block Volume Backup Policy."
+        visible: 
+          and:
+            - add_iscsi_volume
+        default: true
+
+      block_volume_backup_policy_level:
+        type: enum
+        required: false
+        title: "iSCSI Block Volume Backup Policy"
+        description: "Choose the value for iSCSI Block Volume Backup Policy."
+        default: "gold"
+        enum:
+          - "gold"
+          - "silver"
+          - "bronze"
+        visible: 
+          and:
+            - add_iscsi_volume
+            - block_volume_backup_policy_enabled
+
+      block_volume_initial_backup:
+        type: boolean
+        title: "Initial FULL backup of the iSCSI Block Volume"
+        description: "Check the box if you want to take initial FULL backup of the iSCSI Block Volume."
+        visible: 
+          and:
+            - add_iscsi_volume
+        default: true
+
+
+      postgresql_vcn_cidr:
+        type: string
+        visible: true
+        required: false
+        pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
+        title: "VCN CIDR"
+        description: "Choose VCN CIDR for your PostgreSQL deployments."
+        default: "10.1.0.0/16"
+
+      postgresql_subnet_cidr:
+        type: string
+        visible: true
+        required: false
+        pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
+        title: "VCN CIDR"
+        description: "Choose Subnet CIDR for your PostgreSQL deployments."
+        default: "10.1.20.0/24"   
+      
+      create_drg_for_private_subnet:
+        type: boolean
+        visible: 
+          and:
+            - create_in_private_subnet
+        required: false
+        title: "Create DRG for Private Subnet scenario"
+        description: "Providing an option to create Dynamic Routing Gateway (DRG) for VCN and afterwards you can connect to your private subnet from on-premise."
+        default: true        
+
+      postgresql_instance_shape:
+        type: oci:core:instanceshape:name
+        required: false
+        title: "Shape for PostgreSQL Master node"
+        description: "Choose shape for PostgreSQL Master node."
+        default: "VM.Standard.E3.Flex"
+        dependsOn:
+          compartmentId: ${compartment_ocid}  
+
+      postgresql_instance_flex_shape_ocpus:
+        type: number
+        required: false
+        minimum: 1
+        maximum: 128
+        multipleOf: 1
+        default: 1
+        title: "Flex Shape OCPUs"
+        description: "Choose number of OCPUs for Flex Shape."
+        visible:
+          and:
+            - or:
+              - eq:
+                - postgresql_instance_shape 
+                - "VM.Standard.E3.Flex"
+              - eq:
+                - postgresql_instance_shape 
+                - "VM.Standard.E4.Flex"
+
+      postgresql_instance_flex_shape_memory:
+        type: number
+        required: false
+        minimum: 1
+        maximum: 128
+        multipleOf: 1
+        default: 10
+        title: "Flex Shape Memory (GB)"
+        description: "Choose number GB for Flex Shape Memory."
+        visible:
+          and:
+            - or:
+              - eq:
+                - postgresql_instance_shape 
+                - "VM.Standard.E3.Flex"
+              - eq:
+                - postgresql_instance_shape
+                - "VM.Standard.E4.Flex"
+
+      
+      instance_os:
+        type: enum
+        required: false
+        title: "Instance OS"
+        description: "An Operating System that determines the operating system for the instance."
+        default: "Oracle Linux"
+        enum:
+          - "Oracle Linux"
+      
+      linux_os_version:
+        type: enum
+        required: false
+        title: "Instance OS version"
+        description: "An Operating System version that determines the operating system version for the instance."
+        default: "7.9"
+        enum: 
+          - "7.8"
+          - "7.9"
+
+      postgresql_master_fd:
+        type: enum
+        required: false
+        title: "PostgreSQL Master Fault Domain"
+        description: "Choose Fault Domain for PostgreSQL Master."
+        default: "FAULT-DOMAIN-1"
+        enum:
+          - "FAULT-DOMAIN-1"
+          - "FAULT-DOMAIN-2"  
+          - "FAULT-DOMAIN-3"
+
+      postgresql_replicat_username:
+        type: string
+        required: false
+        title: "PostgreSQL Replicat Username"
+        description: "Type PostgreSQL Replicat Username"
+
+      postgresql_hotstandby1_ad:
+        type: oci:identity:availabilitydomain:name
+        required: false
+        title: "AD for the first PostgreSQL HotStandby"
+        description: "Availability Domain for the first PostgreSQL HotStandby."
+        dependsOn:
+          compartmentId: ${compartment_ocid}
+
+      postgresql_hotstandby1_fd:
+        type: enum
+        required: false
+        title: "The first PostgreSQL HotStandby's Fault Domain"
+        description: "Choose Fault Domain for the first PostgreSQL HotStandby."
+        default: "FAULT-DOMAIN-2"
+        enum:
+          - "FAULT-DOMAIN-1"
+          - "FAULT-DOMAIN-2"  
+          - "FAULT-DOMAIN-3"
+
+      postgresql_hotstandby1_shape:
+        type: oci:core:instanceshape:name
+        required: false
+        title: "Shape for the first PostgreSQL HotStandby node"
+        description: "Choose shape for the first PostgreSQL HotStandby node."
+        default: "VM.Standard.E3.Flex"
+        dependsOn:
+          compartmentId: ${compartment_ocid} 
+
+      postgresql_hotstandby1_flex_shape_ocpus:
+        type: number
+        required: false
+        minimum: 1
+        maximum: 128
+        multipleOf: 1
+        default: 1
+        title: "Flex Shape OCPUs"
+        description: "Choose number of OCPUs for Flex Shape."
+        visible:
+          and:
+            - or:
+              - eq:
+                - postgresql_hotstandby1_shape 
+                - "VM.Standard.E3.Flex"
+              - eq:
+                - postgresql_hotstandby1_shape 
+                - "VM.Standard.E4.Flex"
+
+      postgresql_hotstandby1_flex_shape_memory:
+        type: number
+        required: false
+        minimum: 1
+        maximum: 128
+        multipleOf: 1
+        default: 10
+        title: "Flex Shape Memory (GB)"
+        description: "Choose number GB for Flex Shape Memory."
+        visible:
+          and:
+            - or:
+              - eq:
+                - postgresql_hotstandby1_shape 
+                - "VM.Standard.E3.Flex"
+              - eq:
+                - postgresql_hotstandby1_shape
+                - "VM.Standard.E4.Flex"
+
+      postgresql_hotstandby2_ad:
+        type: oci:identity:availabilitydomain:name
+        required: false
+        title: "AD for the second PostgreSQL HotStandby"
+        description: "Availability Domain for the second PostgreSQL HotStandby."
+        dependsOn:
+          compartmentId: ${compartment_ocid}
+
+      postgresql_hotstandby2_fd:
+        type: enum
+        required: false
+        title: "The second PostgreSQL HotStandby's Fault Domain"
+        description: "Choose Fault Domain for the second PostgreSQL HotStandby."
+        default: "FAULT-DOMAIN-3"
+        enum:
+          - "FAULT-DOMAIN-1"
+          - "FAULT-DOMAIN-2"  
+          - "FAULT-DOMAIN-3"
+
+      postgresql_hotstandby2_shape:
+        type: oci:core:instanceshape:name
+        required: false
+        title: "Shape for the second PostgreSQL HotStandby node"
+        description: "Choose shape for the second PostgreSQL HotStandby node."
+        default: "VM.Standard.E3.Flex"
+        dependsOn:
+          compartmentId: ${compartment_ocid}
+
+      postgresql_hotstandby2_flex_shape_ocpus:
+        type: number
+        required: false
+        minimum: 1
+        maximum: 128
+        multipleOf: 1
+        default: 1
+        title: "Flex Shape OCPUs"
+        description: "Choose number of OCPUs for Flex Shape."
+        visible:
+          and:
+            - or:
+              - eq:
+                - postgresql_hotstandby2_shape 
+                - "VM.Standard.E3.Flex"
+              - eq:
+                - postgresql_hotstandby2_shape 
+                - "VM.Standard.E4.Flex"
+
+      postgresql_hotstandby2_flex_shape_memory:
+        type: number
+        required: false
+        minimum: 1
+        maximum: 128
+        multipleOf: 1
+        default: 10
+        title: "Flex Shape Memory (GB)"
+        description: "Choose number GB for Flex Shape Memory."
+        visible:
+          and:
+            - or:
+              - eq:
+                - postgresql_hotstandby2_shape 
+                - "VM.Standard.E3.Flex"
+              - eq:
+                - postgresql_hotstandby2_shape
+                - "VM.Standard.E4.Flex"
+
+
+    outputs:
+
+      generated_ssh_private_key:
+        title: "Generated SSH Private Key"
+        displayText: "Generated SSH Private Key"
+        type: copyableString
+        visible: true
+
+      PostgreSQL_Master_VM_public_IP:
+        title: "PostgreSQL Master VM public IP"
+        displayText: "PostgreSQL Master VM public IP"
+        type: string
+        visible: true
+
+      PostgreSQL_HotStandby1_VM_public_IP:
+        title: "PostgreSQL HotStandby1 VM public IP"
+        displayText: "PostgreSQL HotStandby1 VM public IP"
+        type: string
+        visible: true
+
+      PostgreSQL_HotStandby2_VM_public_IP:
+        title: "PostgreSQL HotStandby2 VM public IP"
+        displayText: "PostgreSQL HotStandby2 VM public IP"
+        type: string
+        visible: true
+
+      PostgreSQL_Username:
+        title: "PostgreSQL Username"
+        displayText: "PostgreSQL Username"
+        type: string
+        visible: true
+
