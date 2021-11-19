@@ -9,6 +9,11 @@ variable "region" {}
 variable "compartment_ocid" {}
 variable "availablity_domain_name" {}
 
+variable "pg_whitelisted_ip" {
+  description = "Should be Public host IP Address like 89.64.91.8"
+  default     = ""
+}
+
 variable "use_existing_vcn" {
   default = false
 }
