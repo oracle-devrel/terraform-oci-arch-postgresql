@@ -14,7 +14,8 @@ variable "use_existing_vcn" {
 }
 
 variable "pg_whitelisted_ip" {
-  default = ""
+  description = "Should be Public host IP Address like 89.64.91.8"
+  default     = ""
 }
 
 variable "postgresql_vcn" {

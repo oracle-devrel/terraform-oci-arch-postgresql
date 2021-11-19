@@ -18,7 +18,10 @@ sudo yum install -y llvm5.0-devel
 sudo yum install -y postgresql${pg_version_no_dot}-devel
 
 # Setting firewall rules
-sudo -u root bash -c "firewall-cmd --permanent --zone=trusted --add-source=${pg_whitelisted_ip}/32"
+export pg_whitelisted_ip='${pg_whitelisted_ip}'
+if [[ $pg_whitelisted_ip != "" ]]; then 
+   sudo -u root bash -c "firewall-cmd --permanent --zone=trusted --add-source=${pg_whitelisted_ip}/32"
+fi
 sudo -u root bash -c "firewall-cmd --permanent --zone=trusted --add-port=5432/tcp"
 sudo -u root bash -c "firewall-cmd --reload"
 

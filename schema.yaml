@@ -34,6 +34,7 @@
           and:
             - show_advanced
       variables:
+      - pg_whitelisted_ip    = var.pg_whitelisted_ip
       - postgresql_vcn_cidr
       - postgresql_subnet_cidr
       - create_drg_for_private_subnet
@@ -102,11 +103,11 @@
       pg_whitelisted_ip: 
         type: string
         visible: 
-           not:
-             - create_in_private_subnet
+          not:
+            - create_in_private_subnet
         required: false
         title: "Whitelisted IP"
-        description: "Choose whitelisted IP in public scenario."
+        description: "Choose whitelisted IP in a public scenario (for example, 89.64.91.8). It will give you the ability to access the database from your laptop and PGAdmin tool."
         default: ""
 
       postgresql_deploy_hotstandby1:
