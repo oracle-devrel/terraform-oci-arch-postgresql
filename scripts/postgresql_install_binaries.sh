@@ -17,6 +17,15 @@ sudo yum-config-manager --enable ol7_developer_EPEL
 sudo yum install -y llvm5.0-devel
 sudo yum install -y postgresql${pg_version_no_dot}-devel
 
+# Setting firewall rules
+export pg_whitelisted_ip='${pg_whitelisted_ip}'
+if [[ $pg_whitelisted_ip != "" ]]; then 
+   sudo -u root bash -c "firewall-cmd --permanent --zone=trusted --add-source=${pg_whitelisted_ip}/32"
+fi
+sudo -u root bash -c "firewall-cmd --permanent --zone=trusted --add-port=5432/tcp"
+sudo -u root bash -c "firewall-cmd --reload"
+
+
 echo '#####################################'
 echo 'PostgreSQL Install Binaries finished.'
 echo '#####################################'

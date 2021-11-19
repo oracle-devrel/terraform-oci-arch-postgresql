@@ -18,6 +18,7 @@ sudo -u root bash -c "firewall-cmd --reload"
 # Create replication user
 chown postgres /tmp/postgresql_master_setup.sql
 sudo -u postgres bash -c "psql -d template1 -f /tmp/postgresql_master_setup.sql"
+sudo -u postgres bash -c "psql -U postgres -d postgres -c \"alter user postgres with password '${pg_password}';\""
 
 if [[ $add_iscsi_volume == "true" ]]; then 
 	# Update the content of postgresql.conf to support WAL
@@ -40,6 +41,10 @@ if [[ $add_iscsi_volume == "true" ]]; then
     sudo -u root bash -c "echo 'host all all ${pg_hotstandby_ip}/32 md5' | sudo tee -a /data/pgsql/pg_hba.conf" 
     sudo -u root bash -c "echo 'host all all ${pg_master_ip}/32 md5' | sudo tee -a /data/pgsql/pg_hba.conf" 
     sudo -u root bash -c "echo 'host all all ${node_subnet_cidr} md5' | sudo tee -a /data/pgsql/pg_hba.conf" 
+    export pg_whitelisted_ip='${pg_whitelisted_ip}'
+	if [[ $pg_whitelisted_ip != "" ]]; then 
+    	sudo -u root bash -c "echo 'host all all ${pg_whitelisted_ip}/0 md5' | sudo tee -a /data/pgsql/pg_hba.conf" 
+    fi
     sudo -u root bash -c "chown postgres /data/pgsql/pg_hba.conf" 
 else
 	# Update the content of postgresql.conf to support WAL
@@ -62,6 +67,10 @@ else
 	sudo -u root bash -c "echo 'host all all ${pg_hotstandby_ip}/32 md5' | sudo tee -a /var/lib/pgsql/${pg_version}/data/pg_hba.conf" 
 	sudo -u root bash -c "echo 'host all all ${pg_master_ip}/32 md5' | sudo tee -a /var/lib/pgsql/${pg_version}/data/pg_hba.conf" 
 	sudo -u root bash -c "echo 'host all all ${node_subnet_cidr} md5' | sudo tee -a /var/lib/pgsql/${pg_version}/data/pg_hba.conf" 
+	export pg_whitelisted_ip='${pg_whitelisted_ip}'
+	if [[ $pg_whitelisted_ip != "" ]]; then 
+    	sudo -u root bash -c "echo 'host all all ${pg_whitelisted_ip}/0 md5' | sudo tee -a /var/lib/pgsql/${pg_version}/data/pg_hba.conf" 
+    fi
 	sudo -u root bash -c "chown postgres /var/lib/pgsql/${pg_version}/data/pg_hba.conf" 
 fi 
 

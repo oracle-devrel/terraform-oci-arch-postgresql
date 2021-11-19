@@ -8,6 +8,7 @@ data "template_file" "postgresql_install_binaries_sh" {
     pg_password       = var.postgresql_password
     pg_version_no_dot = replace(var.postgresql_version, ".", "")
     pg_version        = var.postgresql_version
+    pg_whitelisted_ip = var.pg_whitelisted_ip
   }
 }
 
@@ -44,6 +45,7 @@ data "template_file" "postgresql_master_setup_sh" {
     pg_replicat_username = var.postgresql_replicat_username
     node_subnet_cidr     = var.postgresql_subnet_cidr
     add_iscsi_volume     = var.add_iscsi_volume
+    pg_whitelisted_ip    = var.pg_whitelisted_ip
   }
 }
 
