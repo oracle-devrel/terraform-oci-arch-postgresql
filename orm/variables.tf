@@ -13,6 +13,11 @@ variable "use_existing_vcn" {
   default = false
 }
 
+variable "pg_whitelisted_ip" {
+  description = "Should be Public host IP Address like 89.64.91.8"
+  default     = ""
+}
+
 variable "postgresql_vcn" {
   default = ""
 }
@@ -30,12 +35,12 @@ variable "create_in_private_subnet" {
 }
 
 variable "create_drg_for_private_subnet" {
-  default = true
+  default = false
 }
 
 variable "release" {
   description = "Reference Architecture Release (OCI Architecture Center)"
-  default     = "1.4"
+  default     = "1.4.2"
 }
 
 variable "ssh_public_key" {
@@ -51,7 +56,7 @@ variable "postgresql_subnet_cidr" {
 }
 
 variable "postgresql_instance_shape" {
-  default = "VM.Standard.E3.Flex"
+  default = "VM.Standard.E4.Flex"
 }
 
 variable "postgresql_instance_flex_shape_ocpus" {
@@ -133,7 +138,7 @@ variable "postgresql_hotstandby1_ad" {
 }
 
 variable "postgresql_hotstandby1_shape" {
-  default = "VM.Standard.E3.Flex"
+  default = "VM.Standard.E4.Flex"
 }
 
 variable "postgresql_hotstandby1_flex_shape_ocpus" {
@@ -157,7 +162,7 @@ variable "postgresql_hotstandby2_ad" {
 }
 
 variable "postgresql_hotstandby2_shape" {
-  default = "VM.Standard.E3.Flex"
+  default = "VM.Standard.E4.Flex"
 }
 
 variable "postgresql_hotstandby2_flex_shape_ocpus" {

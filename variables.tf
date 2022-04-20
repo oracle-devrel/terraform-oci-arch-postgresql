@@ -40,7 +40,7 @@ variable "create_drg_for_private_subnet" {
 
 variable "release" {
   description = "Reference Architecture Release (OCI Architecture Center)"
-  default     = "1.4.1"
+  default     = "1.4.2"
 }
 
 variable "ssh_public_key" {
@@ -56,7 +56,7 @@ variable "postgresql_subnet_cidr" {
 }
 
 variable "postgresql_instance_shape" {
-  default = "VM.Standard.E3.Flex"
+  default = "VM.Standard.E4.Flex"
 }
 
 variable "postgresql_instance_flex_shape_ocpus" {
@@ -138,7 +138,7 @@ variable "postgresql_hotstandby1_ad" {
 }
 
 variable "postgresql_hotstandby1_shape" {
-  default = "VM.Standard.E3.Flex"
+  default = "VM.Standard.E4.Flex"
 }
 
 variable "postgresql_hotstandby1_flex_shape_ocpus" {
@@ -162,7 +162,7 @@ variable "postgresql_hotstandby2_ad" {
 }
 
 variable "postgresql_hotstandby2_shape" {
-  default = "VM.Standard.E3.Flex"
+  default = "VM.Standard.E4.Flex"
 }
 
 variable "postgresql_hotstandby2_flex_shape_ocpus" {
