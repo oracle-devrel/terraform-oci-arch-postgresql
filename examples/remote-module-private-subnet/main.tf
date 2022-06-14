@@ -1,4 +1,4 @@
-## Copyright (c) 2021 Oracle and/or its affiliates.
+## Copyright (c) 2022 Oracle and/or its affiliates.
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
 variable "tenancy_ocid" {}
@@ -86,7 +86,7 @@ resource "oci_core_subnet" "my_subnet" {
   prohibit_public_ip_on_vnic = true
 }
 
-module "postgres" {
+module "arch-postgresql" {
   source                   = "github.com/oracle-devrel/terraform-oci-arch-postgresql"
   tenancy_ocid             = var.tenancy_ocid
   user_ocid                = var.user_ocid
@@ -103,19 +103,48 @@ module "postgres" {
   add_iscsi_volume         = true # adding iSCSI volume...
   iscsi_volume_size_in_gbs = 200  # ... with 200 GB of size
   postgresql_version       = "12" # non-default version of PostgreSQL12
-  # OCPUs & memory for flex shape in master node.
-  postgresql_instance_shape             = "VM.Standard.E3.Flex"
+  
+  # OCPUs & memory for flex shape in master node (aarch64/OL8).
+  postgresql_instance_shape             = "VM.Standard.A1.Flex"
   postgresql_instance_flex_shape_ocpus  = 2
   postgresql_instance_flex_shape_memory = 20
-  # OCPUs & memory for flex shape in hotstanby1 node.
+  # OCPUs & memory for flex shape in hotstanby1 node (aarch64/OL8).
   postgresql_deploy_hotstandby1            = true
-  postgresql_hotstandby1_shape             = "VM.Standard.E3.Flex"
+  postgresql_hotstandby1_shape             = "VM.Standard.A1.Flex"
   postgresql_hotstandby1_flex_shape_ocpus  = 1
   postgresql_hotstandby1_flex_shape_memory = 10
-  # OCPUs & memory for flex shape in hotstanby2 node.
+  # OCPUs & memory for flex shape in hotstanby2 node (aarch64/OL8).
   postgresql_deploy_hotstandby2            = true
-  postgresql_hotstandby2_shape             = "VM.Standard.E3.Flex"
+  postgresql_hotstandby2_shape             = "VM.Standard.A1.Flex"
   postgresql_hotstandby2_flex_shape_ocpus  = 1
   postgresql_hotstandby2_flex_shape_memory = 5
 }
 
+output "generated_ssh_private_key" {
+  value     = module.arch-postgresql.generated_ssh_private_key
+  sensitive = true
+}
+
+output "postgresql_master_session_private_ip" {
+  value = module.arch-postgresql.postgresql_master_session_private_ip
+}
+
+output "bastion_ssh_postgresql_master_session_metadata" {
+  value = module.arch-postgresql.bastion_ssh_postgresql_master_session_metadata
+}
+
+output "postgresql_hotstandby1_private_ip" {
+  value = module.arch-postgresql.postgresql_hotstandby1_private_ip
+}
+
+output "bastion_ssh_postgresql_hotstandby1_session_metadata" {
+  value = module.arch-postgresql.bastion_ssh_postgresql_hotstandby1_session_metadata
+}
+
+output "postgresql_hotstandby2_private_ip" {
+  value = module.arch-postgresql.postgresql_hotstandby2_private_ip
+}
+
+output "bastion_ssh_postgresql_hotstandby2_session_metadata" {
+  value = module.arch-postgresql.bastion_ssh_postgresql_hotstandby2_session_metadata
+}

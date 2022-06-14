@@ -40,7 +40,7 @@ variable "create_drg_for_private_subnet" {
 
 variable "release" {
   description = "Reference Architecture Release (OCI Architecture Center)"
-  default     = "1.4.3"
+  default     = "1.5"
 }
 
 variable "ssh_public_key" {
@@ -74,7 +74,7 @@ variable "instance_os" {
 
 variable "linux_os_version" {
   description = "Operating system version for all Linux instances"
-  default     = "7.9"
+  default     = "8"
 }
 
 variable "postgresql_master_fd" {
@@ -177,7 +177,8 @@ variable "postgresql_hotstandby2_flex_shape_memory" {
 locals {
   compute_flexible_shapes = [
     "VM.Standard.E3.Flex",
-    "VM.Standard.E4.Flex"
+    "VM.Standard.E4.Flex",
+    "VM.Standard.A1.Flex"
   ]
 }
 

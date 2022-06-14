@@ -324,6 +324,9 @@
               - eq:
                 - postgresql_instance_shape 
                 - "VM.Standard.E4.Flex"
+              - eq:
+                - postgresql_instance_shape 
+                - "VM.Standard.A1.Flex"
 
       postgresql_instance_flex_shape_memory:
         type: number
@@ -343,7 +346,9 @@
               - eq:
                 - postgresql_instance_shape
                 - "VM.Standard.E4.Flex"
-
+              - eq:
+                - postgresql_instance_shape
+                - "VM.Standard.A1.Flex"
       
       instance_os:
         type: enum
@@ -359,10 +364,9 @@
         required: false
         title: "Instance OS version"
         description: "An Operating System version that determines the operating system version for the instance."
-        default: "7.9"
+        default: "8"
         enum: 
-          - "7.8"
-          - "7.9"
+          - "8"
 
       postgresql_master_fd:
         type: enum
@@ -427,6 +431,9 @@
               - eq:
                 - postgresql_hotstandby1_shape 
                 - "VM.Standard.E4.Flex"
+              - eq:
+                - postgresql_hotstandby1_shape 
+                - "VM.Standard.A1.Flex"
 
       postgresql_hotstandby1_flex_shape_memory:
         type: number
@@ -446,6 +453,9 @@
               - eq:
                 - postgresql_hotstandby1_shape
                 - "VM.Standard.E4.Flex"
+              - eq:
+                - postgresql_hotstandby1_shape
+                - "VM.Standard.A1.Flex"
 
       postgresql_hotstandby2_ad:
         type: oci:identity:availabilitydomain:name
@@ -493,6 +503,9 @@
               - eq:
                 - postgresql_hotstandby2_shape 
                 - "VM.Standard.E4.Flex"
+              - eq:
+                - postgresql_hotstandby2_shape 
+                - "VM.Standard.A1.Flex"
 
       postgresql_hotstandby2_flex_shape_memory:
         type: number
@@ -512,7 +525,9 @@
               - eq:
                 - postgresql_hotstandby2_shape
                 - "VM.Standard.E4.Flex"
-
+              - eq:
+                - postgresql_hotstandby2_shape 
+                - "VM.Standard.A1.Flex"
 
     outputs:
 

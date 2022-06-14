@@ -1,4 +1,4 @@
-## Copyright (c) 2021 Oracle and/or its affiliates.
+## Copyright (c) 2022 Oracle and/or its affiliates.
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
 variable "tenancy_ocid" {}
@@ -86,7 +86,7 @@ resource "oci_core_subnet" "my_subnet" {
   prohibit_public_ip_on_vnic = true
 }
 
-module "postgres" {
+module "arch-postgresql" {
   source                   = "github.com/oracle-devrel/terraform-oci-arch-postgresql"
   tenancy_ocid             = var.tenancy_ocid
   user_ocid                = var.user_ocid
@@ -100,5 +100,14 @@ module "postgres" {
   postgresql_vcn           = oci_core_virtual_network.my_vcn.id # injecting myVCN
   postgresql_subnet        = oci_core_subnet.my_subnet.id       # injecting private mySubnet 
   postgresql_password      = var.postgresql_password
+}
+
+
+output "postgresql_master_session_private_ip" {
+  value = module.arch-postgresql.postgresql_master_session_private_ip
+}
+
+output "bastion_ssh_postgresql_master_session_metadata" {
+  value = module.arch-postgresql.bastion_ssh_postgresql_master_session_metadata
 }
 
