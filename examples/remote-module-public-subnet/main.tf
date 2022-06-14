@@ -10,6 +10,46 @@ variable "compartment_ocid" {}
 variable "availablity_domain_name" {}
 variable "postgresql_password" {}
 
+variable "postgresql_instance_shape" {
+  default = "VM.Standard.A1.Flex"
+}
+
+variable "postgresql_instance_flex_shape_ocpus" {
+  default = 1
+}
+
+variable "postgresql_instance_flex_shape_memory" {
+  default = 6
+}
+
+variable "postgresql_hotstandby1_shape" {
+  default = "VM.Standard.A1.Flex"
+}
+
+variable "postgresql_hotstandby1_flex_shape_ocpus" {
+  default = 1
+}
+
+variable "postgresql_hotstandby1_flex_shape_memory" {
+  default = 2
+}
+
+variable "postgresql_hotstandby2_shape" {
+  default = "VM.Standard.A1.Flex"
+}
+
+variable "postgresql_hotstandby2_flex_shape_ocpus" {
+  default = 1
+}
+
+variable "postgresql_hotstandby2_flex_shape_memory" {
+  default = 2
+}
+
+variable "linux_os_version" {
+  default = "8"
+}
+
 provider "oci" {
   tenancy_ocid     = var.tenancy_ocid
   user_ocid        = var.user_ocid
@@ -85,21 +125,58 @@ resource "oci_core_subnet" "my_subnet" {
   dhcp_options_id   = oci_core_virtual_network.my_vcn.default_dhcp_options_id
 }
 
-module "postgres" {
-  source                        = "github.com/oracle-devrel/terraform-oci-arch-postgresql"
-  tenancy_ocid                  = var.tenancy_ocid
-  user_ocid                     = var.user_ocid
-  fingerprint                   = var.fingerprint
-  region                        = var.region
-  private_key_path              = var.private_key_path
-  availablity_domain_name       = var.availablity_domain_name
-  compartment_ocid              = var.compartment_ocid
-  use_existing_vcn              = true                               # usage of the external existing VCN
-  create_in_private_subnet      = false                              # usage of the public subnet
-  postgresql_vcn                = oci_core_virtual_network.my_vcn.id # injecting myVCN
-  postgresql_subnet             = oci_core_subnet.my_subnet.id       # injecting public mySubnet 
-  postgresql_password           = var.postgresql_password
-  postgresql_deploy_hotstandby1 = true
-  postgresql_deploy_hotstandby2 = true
+module "arch-postgresql" {
+  source                                  = "github.com/oracle-devrel/terraform-oci-arch-postgresql"
+  tenancy_ocid                             = var.tenancy_ocid
+  user_ocid                                = var.user_ocid
+  fingerprint                              = var.fingerprint
+  region                                   = var.region
+  private_key_path                         = var.private_key_path
+  availablity_domain_name                  = var.availablity_domain_name
+  compartment_ocid                         = var.compartment_ocid
+  postgresql_instance_shape                = var.postgresql_instance_shape
+  postgresql_instance_flex_shape_ocpus     = var.postgresql_instance_flex_shape_ocpus
+  postgresql_instance_flex_shape_memory    = var.postgresql_instance_flex_shape_memory
+  postgresql_hotstandby1_shape             = var.postgresql_hotstandby1_shape
+  postgresql_hotstandby1_flex_shape_ocpus  = var.postgresql_hotstandby1_flex_shape_ocpus
+  postgresql_hotstandby1_flex_shape_memory = var.postgresql_hotstandby1_flex_shape_memory
+  postgresql_hotstandby2_shape             = var.postgresql_hotstandby2_shape
+  postgresql_hotstandby2_flex_shape_ocpus  = var.postgresql_hotstandby2_flex_shape_ocpus
+  postgresql_hotstandby2_flex_shape_memory = var.postgresql_hotstandby2_flex_shape_memory
+  use_existing_vcn                         = true                               # usage of the external existing VCN
+  create_in_private_subnet                 = false                              # usage of the public subnet
+  postgresql_vcn                           = oci_core_virtual_network.my_vcn.id # injecting myVCN
+  postgresql_subnet                        = oci_core_subnet.my_subnet.id       # injecting public mySubnet 
+  postgresql_password                      = var.postgresql_password
+  postgresql_deploy_hotstandby1            = true
+  postgresql_deploy_hotstandby2            = true
 }
 
+output "generated_ssh_private_key" {
+  value     = module.arch-postgresql.generated_ssh_private_key
+  sensitive = true
+}
+
+output "postgresql_master_session_private_ip" {
+  value = module.arch-postgresql.postgresql_master_session_private_ip
+}
+
+output "postgresql_master_session_public_ip" {
+  value = module.arch-postgresql.postgresql_master_session_public_ip
+}
+
+output "postgresql_hotstandby1_public_ip" {
+  value = module.arch-postgresql.postgresql_hotstandby1_public_ip
+}
+
+output "postgresql_hotstandby1_private_ip" {
+  value = module.arch-postgresql.postgresql_hotstandby1_private_ip
+}
+
+output "postgresql_hotstandby2_public_ip" {
+  value = module.arch-postgresql.postgresql_hotstandby2_public_ip
+}
+
+output "postgresql_hotstandby2_private_ip" {
+  value = module.arch-postgresql.postgresql_hotstandby2_private_ip
+}

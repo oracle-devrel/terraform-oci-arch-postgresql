@@ -1,4 +1,4 @@
-## Copyright (c) 2021 Oracle and/or its affiliates.
+## Copyright (c) 2022 Oracle and/or its affiliates.
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
 variable "tenancy_ocid" {}
@@ -10,6 +10,15 @@ variable "compartment_ocid" {}
 variable "availablity_domain_name" {}
 variable "postgresql_password" {}
 
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    oci = {
+      source  = "oracle/oci"
+    }
+  }
+}
+
 provider "oci" {
   tenancy_ocid     = var.tenancy_ocid
   user_ocid        = var.user_ocid
@@ -18,7 +27,7 @@ provider "oci" {
   region           = var.region
 }
 
-module "postgres" {
+module "arch-postgresql" {
   source                  = "github.com/oracle-devrel/terraform-oci-arch-postgresql"
   tenancy_ocid            = var.tenancy_ocid
   user_ocid               = var.user_ocid
@@ -30,3 +39,11 @@ module "postgres" {
   postgresql_password     = var.postgresql_password
 }
 
+
+output "postgresql_master_session_private_ip" {
+  value = module.arch-postgresql.postgresql_master_session_private_ip
+}
+
+output "bastion_ssh_postgresql_master_session_metadata" {
+  value = module.arch-postgresql.bastion_ssh_postgresql_master_session_metadata
+}
