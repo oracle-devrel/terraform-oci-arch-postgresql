@@ -191,7 +191,7 @@ resource "null_resource" "postgresql_master_install_binaries" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "sudo rm -rf ~/postgresql_install_binaries.sh"
+      "sudo rm -rf /home/opc/postgresql_install_binaries.sh"
     ]
   }
 
@@ -211,7 +211,7 @@ resource "null_resource" "postgresql_master_install_binaries" {
     }
 
     content     = data.template_file.postgresql_install_binaries_sh.rendered
-    destination = "~/postgresql_install_binaries.sh"
+    destination = "/home/opc/postgresql_install_binaries.sh"
   }
 
   provisioner "remote-exec" {
@@ -229,8 +229,8 @@ resource "null_resource" "postgresql_master_install_binaries" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "chmod +x ~/postgresql_install_binaries.sh",
-      "sudo ~/postgresql_install_binaries.sh"
+      "chmod +x /home/opc/postgresql_install_binaries.sh",
+      "sudo /home/opc/postgresql_install_binaries.sh"
     ]
   }
 }
@@ -258,7 +258,7 @@ resource "null_resource" "postgresql_master_initdb" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "sudo rm -rf ~/postgresql_master_initdb.sh"
+      "sudo rm -rf /home/opc/postgresql_master_initdb.sh"
     ]
   }
 
@@ -278,7 +278,7 @@ resource "null_resource" "postgresql_master_initdb" {
     }
 
     content     = data.template_file.postgresql_master_initdb_sh.rendered
-    destination = "~/postgresql_master_initdb.sh"
+    destination = "/home/opc/postgresql_master_initdb.sh"
   }
 
   provisioner "remote-exec" {
@@ -296,8 +296,8 @@ resource "null_resource" "postgresql_master_initdb" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "chmod +x ~/postgresql_master_initdb.sh",
-      "sudo ~/postgresql_master_initdb.sh"
+      "chmod +x /home/opc/postgresql_master_initdb.sh",
+      "sudo /home/opc/postgresql_master_initdb.sh"
     ]
   }
 }
@@ -326,7 +326,7 @@ resource "null_resource" "postgresql_hotstandby1_install_binaries" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "sudo rm -rf ~/postgresql_install_binaries.sh"
+      "sudo rm -rf /home/opc/postgresql_install_binaries.sh"
     ]
   }
 
@@ -346,7 +346,7 @@ resource "null_resource" "postgresql_hotstandby1_install_binaries" {
     }
 
     content     = data.template_file.postgresql_install_binaries_sh.rendered
-    destination = "~/postgresql_install_binaries.sh"
+    destination = "/home/opc/postgresql_install_binaries.sh"
   }
 
   provisioner "remote-exec" {
@@ -364,8 +364,8 @@ resource "null_resource" "postgresql_hotstandby1_install_binaries" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "chmod +x ~/postgresql_install_binaries.sh",
-      "sudo ~/postgresql_install_binaries.sh"
+      "chmod +x /home/opc/postgresql_install_binaries.sh",
+      "sudo /home/opc/postgresql_install_binaries.sh"
     ]
   }
 }
@@ -394,7 +394,7 @@ resource "null_resource" "postgresql_hotstandby2_install_binaries" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "sudo rm -rf ~/postgresql_install_binaries.sh"
+      "sudo rm -rf /home/opc/postgresql_install_binaries.sh"
     ]
   }
 
@@ -414,7 +414,7 @@ resource "null_resource" "postgresql_hotstandby2_install_binaries" {
     }
 
     content     = data.template_file.postgresql_install_binaries_sh.rendered
-    destination = "~/postgresql_install_binaries.sh"
+    destination = "/home/opc/postgresql_install_binaries.sh"
   }
 
   provisioner "remote-exec" {
@@ -432,8 +432,8 @@ resource "null_resource" "postgresql_hotstandby2_install_binaries" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "chmod +x ~/postgresql_install_binaries.sh",
-      "sudo ~/postgresql_install_binaries.sh"
+      "chmod +x /home/opc/postgresql_install_binaries.sh",
+      "sudo /home/opc/postgresql_install_binaries.sh"
     ]
   }
 }
@@ -463,7 +463,7 @@ resource "null_resource" "postgresql_master_setup" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "sudo rm -rf ~/postgresql_master_setup.sh",
+      "sudo rm -rf /home/opc/postgresql_master_setup.sh",
       "sudo rm -rf /tmp/postgresql_master_setup_sql",
     ]
   }
@@ -484,7 +484,7 @@ resource "null_resource" "postgresql_master_setup" {
     }
 
     content     = element(data.template_file.postgresql_master_setup_sh.*.rendered, 0)
-    destination = "~/postgresql_master_setup.sh"
+    destination = "/home/opc/postgresql_master_setup.sh"
   }
 
   provisioner "file" {
@@ -521,8 +521,8 @@ resource "null_resource" "postgresql_master_setup" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "chmod +x ~/postgresql_master_setup.sh",
-      "sudo ~/postgresql_master_setup.sh"
+      "chmod +x /home/opc/postgresql_master_setup.sh",
+      "sudo /home/opc/postgresql_master_setup.sh"
     ]
   }
 }
@@ -551,7 +551,7 @@ resource "null_resource" "postgresql_master_setup2" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "sudo rm -rf ~/postgresql_master_setup2.sh",
+      "sudo rm -rf /home/opc/postgresql_master_setup2.sh",
     ]
   }
 
@@ -571,7 +571,7 @@ resource "null_resource" "postgresql_master_setup2" {
     }
 
     content     = element(data.template_file.postgresql_master_setup2_sh.*.rendered, 0)
-    destination = "~/postgresql_master_setup2.sh"
+    destination = "/home/opc/postgresql_master_setup2.sh"
   }
 
   provisioner "remote-exec" {
@@ -589,8 +589,8 @@ resource "null_resource" "postgresql_master_setup2" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "chmod +x ~/postgresql_master_setup2.sh",
-      "sudo ~/postgresql_master_setup2.sh"
+      "chmod +x /home/opc/postgresql_master_setup2.sh",
+      "sudo /home/opc/postgresql_master_setup2.sh"
     ]
   }
 }
@@ -709,7 +709,7 @@ resource "null_resource" "postgresql_hotstandby1_setup" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "sudo rm -rf ~/postgresql_standby_setup.sh",
+      "sudo rm -rf /home/opc/postgresql_standby_setup.sh",
     ]
   }
 
@@ -729,7 +729,7 @@ resource "null_resource" "postgresql_hotstandby1_setup" {
     }
 
     content     = element(data.template_file.postgresql_standby_setup_sh.*.rendered, 0)
-    destination = "~/postgresql_standby_setup.sh"
+    destination = "/home/opc/postgresql_standby_setup.sh"
   }
 
   provisioner "remote-exec" {
@@ -747,8 +747,8 @@ resource "null_resource" "postgresql_hotstandby1_setup" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "chmod +x ~/postgresql_standby_setup.sh",
-      "sudo ~/postgresql_standby_setup.sh"
+      "chmod +x /home/opc/postgresql_standby_setup.sh",
+      "sudo /home/opc/postgresql_standby_setup.sh"
     ]
   }
 }
@@ -866,7 +866,7 @@ resource "null_resource" "postgresql_hotstandby2_setup" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "sudo rm -rf ~/postgresql_standby_setup.sh",
+      "sudo rm -rf /home/opc/postgresql_standby_setup.sh",
     ]
   }
 
@@ -886,7 +886,7 @@ resource "null_resource" "postgresql_hotstandby2_setup" {
     }
 
     content     = element(data.template_file.postgresql_standby_setup_sh.*.rendered, 0)
-    destination = "~/postgresql_standby_setup.sh"
+    destination = "/home/opc/postgresql_standby_setup.sh"
   }
 
   provisioner "remote-exec" {
@@ -904,8 +904,8 @@ resource "null_resource" "postgresql_hotstandby2_setup" {
       bastion_private_key = var.create_in_private_subnet ? tls_private_key.public_private_key_pair.private_key_pem : null
     }
     inline = [
-      "chmod +x ~/postgresql_standby_setup.sh",
-      "sudo ~/postgresql_standby_setup.sh"
+      "chmod +x /home/opc/postgresql_standby_setup.sh",
+      "sudo /home/opc/postgresql_standby_setup.sh"
     ]
   }
 }
