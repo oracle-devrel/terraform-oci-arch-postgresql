@@ -7,7 +7,7 @@ variable "fingerprint" {}
 variable "private_key_path" {}
 variable "region" {}
 variable "compartment_ocid" {}
-variable "availablity_domain_name" {}
+variable "availability_domain_name" {}
 variable "postgresql_password" {}
 
 terraform {
@@ -34,7 +34,7 @@ module "arch-postgresql" {
   fingerprint             = var.fingerprint
   region                  = var.region
   private_key_path        = var.private_key_path
-  availablity_domain_name = var.availablity_domain_name
+  availability_domain_name = var.availability_domain_name
   compartment_ocid        = var.compartment_ocid
   postgresql_password     = var.postgresql_password
 }

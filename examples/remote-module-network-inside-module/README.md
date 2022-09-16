@@ -29,8 +29,8 @@ region = "<oci_region>"
 # Compartment
 compartment_ocid = "<compartment_ocid>"
 
-# Availablity Domain
-availablity_domain_name = "<availablity_domain_name>"
+# availability Domain
+availability_domain_name = "<availability_domain_name>"
 
 # PostgreSQL Password
 postgresql_password     = "<postgresql_password>"

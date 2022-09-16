@@ -20,7 +20,7 @@ data "template_cloudinit_config" "cloud_init" {
 }
 
 resource "oci_core_instance" "postgresql_master" {
-  availability_domain = var.availablity_domain_name
+  availability_domain = var.availability_domain_name
   compartment_id      = var.compartment_ocid
   display_name        = "PostgreSQL_Master"
   shape               = var.postgresql_instance_shape
@@ -87,7 +87,7 @@ resource "oci_core_volume_backup_policy_assignment" "postgresql_master_boot_volu
 
 resource "oci_core_instance" "postgresql_hotstandby1" {
   count               = var.postgresql_deploy_hotstandby1 ? 1 : 0
-  availability_domain = var.postgresql_hotstandby1_ad == "" ? var.availablity_domain_name : var.postgresql_hotstandby1_ad
+  availability_domain = var.postgresql_hotstandby1_ad == "" ? var.availability_domain_name : var.postgresql_hotstandby1_ad
   compartment_id      = var.compartment_ocid
   display_name        = "PostgreSQL_HotStandby1"
   shape               = var.postgresql_hotstandby1_shape
@@ -155,7 +155,7 @@ resource "oci_core_volume_backup_policy_assignment" "postgresql_hotstandby1_boot
 
 resource "oci_core_instance" "postgresql_hotstandby2" {
   count               = var.postgresql_deploy_hotstandby2 ? 1 : 0
-  availability_domain = var.postgresql_hotstandby2_ad == "" ? var.availablity_domain_name : var.postgresql_hotstandby2_ad
+  availability_domain = var.postgresql_hotstandby2_ad == "" ? var.availability_domain_name : var.postgresql_hotstandby2_ad
   compartment_id      = var.compartment_ocid
   display_name        = "PostgreSQL_HotStandby2"
   shape               = var.postgresql_hotstandby2_shape

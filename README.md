@@ -58,8 +58,8 @@ private_key_path     = "<pem_private_key_path>"
 # Region
 region = "<oci_region>"
 
-# Availablity Domain 
-availablity_domain_name = "<availablity_domain_name>" # for example GrCH:US-ASHBURN-AD-1
+# availability Domain 
+availability_domain_name = "<availability_domain_name>" # for example GrCH:US-ASHBURN-AD-1
 
 # Compartment
 compartment_ocid        = "<compartment_ocid>"
@@ -72,12 +72,12 @@ postgresql_version      = "<postgresql_version>"
 
 # Optional first HotStandby 
 postgresql_deploy_hotstandby1 = true
-postgresql_hotstandby1_ad = "<availablity_domain_name>" # for example GrCH:US-ASHBURN-AD-2
+postgresql_hotstandby1_ad = "<availability_domain_name>" # for example GrCH:US-ASHBURN-AD-2
 postgresql_hotstandby1_fd = "<postgresql_hotstandby1_fd>" # for example FAULT-DOMAIN-2
 
 # Optional second HotStandby 
 postgresql_deploy_hotstandby2 = true
-postgresql_hotstandby2_ad = "<availablity_domain_name>" # for example GrCH:US-ASHBURN-AD-3
+postgresql_hotstandby2_ad = "<availability_domain_name>" # for example GrCH:US-ASHBURN-AD-3
 postgresql_hotstandby2_fd = "<postgresql_hotstandby2_fd>" # for example FAULT-DOMAIN-3
 
 ````
@@ -105,7 +105,7 @@ module "arch-postgresql" {
   fingerprint                   = "<finger_print>"
   private_key_path              = "<private_key_path>"
   region                        = "<oci_region>"
-  availablity_domain_name       = "<availablity_domain_name>"
+  availability_domain_name       = "<availability_domain_name>"
   compartment_ocid              = "<compartment_ocid>"
   use_existing_vcn              = true # You can inject your own VCN and subnet 
   create_in_private_subnet      = true # Subnet should be associated with NATGW and proper Route Table.

@@ -7,7 +7,12 @@ variable "fingerprint" {}
 variable "private_key_path" {}
 variable "region" {}
 variable "compartment_ocid" {}
-variable "availablity_domain_name" {}
+variable "availability_domain_name" {}
+
+variable "release" {
+  description = "Reference Architecture Release (OCI Architecture Center)"
+  default     = "1.6"
+}
 
 variable "use_existing_vcn" {
   default = false
@@ -36,11 +41,6 @@ variable "create_in_private_subnet" {
 
 variable "create_drg_for_private_subnet" {
   default = false
-}
-
-variable "release" {
-  description = "Reference Architecture Release (OCI Architecture Center)"
-  default     = "1.5"
 }
 
 variable "ssh_public_key" {
@@ -74,7 +74,7 @@ variable "instance_os" {
 
 variable "linux_os_version" {
   description = "Operating system version for all Linux instances"
-  default     = "8"
+  default     = "9"
 }
 
 variable "postgresql_master_fd" {
