@@ -3,13 +3,13 @@
 
 data "oci_core_vnic_attachments" "postgresql_master_vnics" {
   compartment_id      = var.compartment_ocid
-  availability_domain = var.availablity_domain_name
+  availability_domain = var.availability_domain_name
   instance_id         = oci_core_instance.postgresql_master.id
 }
 
 
 data "oci_core_vnic_attachments" "postgresql_master_primaryvnic_attach" {
-  availability_domain = var.availablity_domain_name
+  availability_domain = var.availability_domain_name
   compartment_id      = var.compartment_ocid
   instance_id         = oci_core_instance.postgresql_master.id
 }

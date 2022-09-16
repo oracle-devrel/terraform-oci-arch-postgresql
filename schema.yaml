@@ -21,7 +21,7 @@
     - title: Required Configuration  
       variables:
       - compartment_ocid
-      - availablity_domain_name
+      - availability_domain_name
       - postgresql_version
       - postgresql_password
       - postgresql_deploy_hotstandby1
@@ -138,7 +138,7 @@
         title: Region
         description: "Region where you want to deploy the resources defined by this stack."
 
-      availablity_domain_name:
+      availability_domain_name:
         type: oci:identity:availabilitydomain:name
         required: true
         visible: true

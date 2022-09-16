@@ -7,7 +7,7 @@ variable "fingerprint" {}
 variable "private_key_path" {}
 variable "region" {}
 variable "compartment_ocid" {}
-variable "availablity_domain_name" {}
+variable "availability_domain_name" {}
 variable "postgresql_password" {}
 
 provider "oci" {
@@ -93,7 +93,7 @@ module "arch-postgresql" {
   fingerprint              = var.fingerprint
   region                   = var.region
   private_key_path         = var.private_key_path
-  availablity_domain_name  = var.availablity_domain_name
+  availability_domain_name  = var.availability_domain_name
   compartment_ocid         = var.compartment_ocid
   use_existing_vcn         = true                               # usage of the external existing VCN
   create_in_private_subnet = true                               # usage of the private subnet
