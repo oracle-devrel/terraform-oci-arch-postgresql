@@ -11,7 +11,7 @@ variable "availability_domain_name" {}
 
 variable "release" {
   description = "Reference Architecture Release (OCI Architecture Center)"
-  default     = "1.6"
+  default     = "1.6.1"
 }
 
 variable "use_existing_vcn" {
@@ -178,7 +178,8 @@ locals {
   compute_flexible_shapes = [
     "VM.Standard.E3.Flex",
     "VM.Standard.E4.Flex",
-    "VM.Standard.A1.Flex"
+    "VM.Standard.A1.Flex",
+    "VM.Standard3.Flex"
   ]
 }
 

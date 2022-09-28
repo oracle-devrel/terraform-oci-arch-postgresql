@@ -327,6 +327,9 @@
               - eq:
                 - postgresql_instance_shape 
                 - "VM.Standard.A1.Flex"
+              - eq:
+                - postgresql_instance_shape
+                - "VM.Standard3.Flex"
 
       postgresql_instance_flex_shape_memory:
         type: number
@@ -349,7 +352,10 @@
               - eq:
                 - postgresql_instance_shape
                 - "VM.Standard.A1.Flex"
-      
+              - eq:
+                - postgresql_instance_shape
+                - "VM.Standard3.Flex"
+
       instance_os:
         type: enum
         required: false
@@ -434,6 +440,9 @@
               - eq:
                 - postgresql_hotstandby1_shape 
                 - "VM.Standard.A1.Flex"
+              - eq:
+                - postgresql_hotstandby1_shape
+                - "VM.Standard3.Flex"
 
       postgresql_hotstandby1_flex_shape_memory:
         type: number
@@ -456,6 +465,9 @@
               - eq:
                 - postgresql_hotstandby1_shape
                 - "VM.Standard.A1.Flex"
+              - eq:
+                - postgresql_hotstandby1_shape
+                - "VM.Standard3.Flex"
 
       postgresql_hotstandby2_ad:
         type: oci:identity:availabilitydomain:name
@@ -506,6 +518,9 @@
               - eq:
                 - postgresql_hotstandby2_shape 
                 - "VM.Standard.A1.Flex"
+              - eq:
+                - postgresql_hotstandby2_shape
+                - "VM.Standard3.Flex"
 
       postgresql_hotstandby2_flex_shape_memory:
         type: number
@@ -528,6 +543,9 @@
               - eq:
                 - postgresql_hotstandby2_shape 
                 - "VM.Standard.A1.Flex"
+              - eq:
+                - postgresql_hotstandby2_shape
+                - "VM.Standard3.Flex"
 
     outputs:
 
