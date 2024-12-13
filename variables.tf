@@ -2,12 +2,18 @@
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
 variable "tenancy_ocid" {}
-variable "user_ocid" {}
-variable "fingerprint" {}
-variable "private_key_path" {}
+variable "user_ocid" {
+  default = "dummy"
+}
+variable "fingerprint" {
+  default = "dummy"
+}
+variable "private_key_path" {
+  default = "/dummy"
+}
 variable "region" {}
 variable "compartment_ocid" {}
-variable "availability_domain_name" {}
+variable "availability_domain_number" {}
 
 variable "release" {
   description = "Reference Architecture Release (OCI Architecture Center)"
@@ -21,6 +27,10 @@ variable "use_existing_vcn" {
 variable "pg_whitelisted_ip" {
   description = "Should be Public host IP Address like 89.64.91.8"
   default     = ""
+}
+variable "pg_whitelist_cidr" {
+  description = "Cidr block to be added in the firewall-cmd in trusted zone"
+  default = ""
 }
 
 variable "postgresql_vcn" {
@@ -74,11 +84,11 @@ variable "instance_os" {
 
 variable "linux_os_version" {
   description = "Operating system version for all Linux instances"
-  default     = "9"
+  default     = "8"
 }
 
 variable "postgresql_master_fd" {
-  default = "FAULT-DOMAIN-1"
+  default = "1"
 }
 
 variable "postgresql_replicat_username" {
@@ -130,7 +140,7 @@ variable "postgresql_deploy_hotstandby1" {
 }
 
 variable "postgresql_hotstandby1_fd" {
-  default = "FAULT-DOMAIN-2"
+  default = "2"
 }
 
 variable "postgresql_hotstandby1_ad" {
@@ -154,7 +164,7 @@ variable "postgresql_deploy_hotstandby2" {
 }
 
 variable "postgresql_hotstandby2_fd" {
-  default = "FAULT-DOMAIN-3"
+  default = "3"
 }
 
 variable "postgresql_hotstandby2_ad" {

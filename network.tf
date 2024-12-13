@@ -7,14 +7,14 @@ resource "oci_core_virtual_network" "postgresql_vcn" {
   compartment_id = var.compartment_ocid
   display_name   = "PostgreSQLVCN"
   dns_label      = "postgresvcn"
-  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_drg" "postgresql_drg" {
   count          = (var.create_in_private_subnet && var.create_drg_for_private_subnet && !var.use_existing_vcn) ? 1 : 0
   compartment_id = var.compartment_ocid
   display_name   = "PostgreSQLDRG"
-  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_drg_attachment" "postgresql_drg_attachment" {
@@ -29,7 +29,7 @@ resource "oci_core_internet_gateway" "postgresql_igw" {
   compartment_id = var.compartment_ocid
   display_name   = "PostgreSQLIGW"
   vcn_id         = oci_core_virtual_network.postgresql_vcn[0].id
-  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_route_table" "postgresql_rt" {
@@ -43,7 +43,7 @@ resource "oci_core_route_table" "postgresql_rt" {
     destination_type  = "CIDR_BLOCK"
     network_entity_id = oci_core_internet_gateway.postgresql_igw[count.index].id
   }
-  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_nat_gateway" "postgresql_nat" {
@@ -51,7 +51,7 @@ resource "oci_core_nat_gateway" "postgresql_nat" {
   compartment_id = var.compartment_ocid
   display_name   = "PostgreSQLNAT"
   vcn_id         = oci_core_virtual_network.postgresql_vcn[0].id
-  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_route_table" "postgresql_rt2" {
@@ -65,7 +65,7 @@ resource "oci_core_route_table" "postgresql_rt2" {
     destination_type  = "CIDR_BLOCK"
     network_entity_id = oci_core_nat_gateway.postgresql_nat[count.index].id
   }
-  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_subnet" "postgresql_subnet" {
@@ -79,6 +79,6 @@ resource "oci_core_subnet" "postgresql_subnet" {
   route_table_id             = var.create_in_private_subnet ? oci_core_route_table.postgresql_rt2[0].id : oci_core_route_table.postgresql_rt[0].id
   dhcp_options_id            = oci_core_virtual_network.postgresql_vcn[0].default_dhcp_options_id
   prohibit_public_ip_on_vnic = var.create_in_private_subnet ? true : false
-  defined_tags               = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags               = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
