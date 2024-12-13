@@ -47,7 +47,8 @@ then
    sudo yum-config-manager --enable ol7_developer_EPEL
    sudo yum install -y llvm5.0-devel
    sudo yum install -y postgresql${pg_version_no_dot}-devel
-   #sudo yum install -y postgis32_${pg_version_no_dot}
+   sudo yum install -y postgis34_${pg_version_no_dot}
+   sudo yum install -y pgvector_${pg_version_no_dot}
    echo '-[100%]-> Install PostgreSQL pg_utility (postgresql${pg_version_no_dot}-devel OL7) installed.'
 fi 
 if [[ $(uname -r | sed 's/^.*\(el[0-9]\+\).*$/\1/') == "el8" ]]
@@ -59,13 +60,8 @@ then
   sudo dnf config-manager --enable ol8_codeready_builder
   sudo yum install -y llvm-devel
   sudo yum install -y postgresql${pg_version_no_dot}-devel
-  #postgis version is hardcoded
   sudo yum install -y postgis34_${pg_version_no_dot}
   sudo yum install -y pgvector_${pg_version_no_dot}
-  #  sudo yum-config-manager --enable ol8_developer
-  #  sudo yum-config-manager --enable ol8_developer_EPEL
-  #  sudo yum install -y llvm5.0-devel
-  #  sudo yum install -y postgresql${pg_version_no_dot}-devel
   echo '-[100%]-> Install PostgreSQL pg_utility (postgresql${pg_version_no_dot}-devel OL8) installed.'
 fi 
 
