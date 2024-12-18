@@ -1,15 +1,32 @@
 ## Copyright (c) 2022 Oracle and/or its affiliates.
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
+
+
+locals {
+  get_ad = "${lookup(data.oci_identity_availability_domains.ads.availability_domains[var.availability_domain_number - 1], "name")}"
+  standby1_ad = var.postgresql_hotstandby1_ad == "" ? null : "${lookup(data.oci_identity_availability_domains.ads.availability_domains[var.postgresql_hotstandby1_ad - 1], "name")}"
+  standby2_ad = var.postgresql_hotstandby2_ad == "" ? null : "${lookup(data.oci_identity_availability_domains.ads.availability_domains[var.postgresql_hotstandby2_ad - 1], "name")}"
+
+}
+
+
+data "oci_identity_availability_domains" "ads" {
+    #Required
+    compartment_id = var.compartment_ocid
+}
+
+
+
 data "oci_core_vnic_attachments" "postgresql_master_vnics" {
   compartment_id      = var.compartment_ocid
-  availability_domain = var.availability_domain_name
+  availability_domain = local.get_ad
   instance_id         = oci_core_instance.postgresql_master.id
 }
 
 
 data "oci_core_vnic_attachments" "postgresql_master_primaryvnic_attach" {
-  availability_domain = var.availability_domain_name
+  availability_domain = local.get_ad
   compartment_id      = var.compartment_ocid
   instance_id         = oci_core_instance.postgresql_master.id
 }
@@ -20,7 +37,7 @@ data "oci_core_vnic" "postgresql_master_primaryvnic" {
 
 data "oci_core_vnic_attachments" "postgresql_hotstandby1_primaryvnic_attach" {
   count               = var.postgresql_deploy_hotstandby1 ? 1 : 0
-  availability_domain = var.postgresql_hotstandby1_ad
+  availability_domain = local.standby1_ad
   compartment_id      = var.compartment_ocid
   instance_id         = oci_core_instance.postgresql_hotstandby1[count.index].id
 }
@@ -32,7 +49,7 @@ data "oci_core_vnic" "postgresql_hotstandby1_primaryvnic" {
 
 data "oci_core_vnic_attachments" "postgresql_hotstandby2_primaryvnic_attach" {
   count               = var.postgresql_deploy_hotstandby2 ? 1 : 0
-  availability_domain = var.postgresql_hotstandby2_ad
+  availability_domain = local.standby2_ad
   compartment_id      = var.compartment_ocid
   instance_id         = oci_core_instance.postgresql_hotstandby2[count.index].id
 }

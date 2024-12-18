@@ -7,9 +7,7 @@ echo '#################################################'
 export pg_version='${pg_version}'
 export add_iscsi_volume='${add_iscsi_volume}'
 
-echo '--> Change password of postgres user...'
-echo "postgres:${pg_password}" | chpasswd
-echo '-[100%]-> postgres user password changed.' 
+
 
 echo '--> Updating firewall rules with hotstandby1 IP (${pg_hotstandby_ip}) on master host...'
 sudo -u root bash -c "firewall-cmd --permanent --zone=trusted --add-source=${pg_hotstandby_ip}/32"
@@ -21,7 +19,6 @@ echo '-[100%]-> Firewall updated with hotstandby1 IP (${pg_hotstandby_ip}) on ma
 echo '--> Create replication user...'
 chown postgres /tmp/postgresql_master_setup.sql
 sudo -u postgres bash -c "psql -d template1 -f /tmp/postgresql_master_setup.sql"
-sudo -u postgres bash -c "psql -U postgres -d postgres -c \"alter user postgres with password '${pg_password}';\""
 echo '-[100%]-> Replication user created.' 
 
 if [[ $add_iscsi_volume == "true" ]]; then 
@@ -36,7 +33,6 @@ if [[ $add_iscsi_volume == "true" ]]; then
 	   sudo -u root bash -c "echo 'wal_keep_segments = 8' | sudo tee -a /data/pgsql/postgresql.conf"
     fi
     sudo -u root bash -c "echo 'hot_standby = on' | sudo tee -a /data/pgsql/postgresql.conf"
-    sudo -u root bash -c "echo 'listen_addresses = '\''0.0.0.0'\'' ' | sudo tee -a /data/pgsql/postgresql.conf"
     sudo -u root bash -c "chown postgres /data/pgsql/postgresql.conf"
     echo '-[100%]-> File postgresql.conf updated with WAL support.' 
 
@@ -64,7 +60,6 @@ else
 		sudo -u root bash -c "echo 'wal_keep_segments = 8' | sudo tee -a /var/lib/pgsql/${pg_version}/data/postgresql.conf"
 	fi
 	sudo -u root bash -c "echo 'hot_standby = on' | sudo tee -a /var/lib/pgsql/${pg_version}/data/postgresql.conf"
-	sudo -u root bash -c "echo 'listen_addresses = '\''0.0.0.0'\'' ' | sudo tee -a /var/lib/pgsql/${pg_version}/data/postgresql.conf"
 	sudo -u root bash -c "chown postgres /var/lib/pgsql/${pg_version}/data/postgresql.conf"
     echo '-[100%]-> File postgresql.conf updated with WAL support.' 
 

@@ -3,11 +3,11 @@
 
 resource "oci_core_volume" "postgresql_master_volume" {
   count               = var.add_iscsi_volume ? 1 : 0
-  availability_domain = var.availability_domain_name
+  availability_domain = local.get_ad
   compartment_id      = var.compartment_ocid
   display_name        = "PostgreSQL_Master_Volume"
   size_in_gbs         = var.iscsi_volume_size_in_gbs
-  defined_tags        = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags        = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_volume_attachment" "postgresql_master_volume_attachment" {
@@ -32,11 +32,11 @@ resource "oci_core_volume_backup_policy_assignment" "postgresql_master_volume_ba
 
 resource "oci_core_volume" "postgresql_hotstandby1_volume" {
   count               = (var.postgresql_deploy_hotstandby1 && var.add_iscsi_volume && var.boot_volume_initial_backup) ? 1 : 0
-  availability_domain = var.postgresql_hotstandby1_ad == "" ? var.availability_domain_name : var.postgresql_hotstandby1_ad
+  availability_domain = var.postgresql_hotstandby1_ad == "" ? local.get_ad : local.standby2_ad
   compartment_id      = var.compartment_ocid
   display_name        = "PostgreSQL_HotStandby1_Volume"
   size_in_gbs         = var.iscsi_volume_size_in_gbs
-  defined_tags        = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags        = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_volume_attachment" "postgresql_hotstandby1_volume_attachment" {
@@ -61,11 +61,11 @@ resource "oci_core_volume_backup_policy_assignment" "postgresql_hotstandby1_volu
 
 resource "oci_core_volume" "postgresql_hotstandby2_volume" {
   count               = (var.postgresql_deploy_hotstandby2 && var.add_iscsi_volume) ? 1 : 0
-  availability_domain = var.postgresql_hotstandby2_ad == "" ? var.availability_domain_name : var.postgresql_hotstandby2_ad
+  availability_domain = var.postgresql_hotstandby2_ad == "" ? local.get_ad : local.standby2_ad
   compartment_id      = var.compartment_ocid
   display_name        = "PostgreSQL_HotStandby2_Volume"
   size_in_gbs         = var.iscsi_volume_size_in_gbs
-  defined_tags        = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags        = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_volume_attachment" "postgresql_hotstandby2_volume_attachment" {

@@ -31,13 +31,7 @@ if [[ $add_iscsi_volume == "true" ]]; then
 	echo '-[100%]-> Initial backup of database taken.'
 
 	echo '--> Updating content of recovery.conf/postgresql.conf files...'
-	if [[ $pg_version == "13" ]]; then 
-		touch /data/pgsql/standby.signal
-		touch /data/pgsql/recovery.signal
-		sudo -u root bash -c "echo 'primary_conninfo  = '\''host=${pg_master_ip} port=5432 user=${pg_replicat_username} password=${pg_replicat_password}'\'' ' | sudo tee -a /data/pgsql/postgresql.conf"
-    	sudo -u root bash -c "echo 'recovery_target_timeline = '\''latest'\'' ' | sudo tee -a /data/pgsql/postgresql.conf"
-    	sudo -u root bash -c "chown postgres /data/pgsql/postgresql.conf"
-	elif [[ $pg_version == "12"  ]]; then
+	if [[ $pg_version -ge "12" ]]; then 
 		touch /data/pgsql/standby.signal
 		touch /data/pgsql/recovery.signal
 		sudo -u root bash -c "echo 'primary_conninfo  = '\''host=${pg_master_ip} port=5432 user=${pg_replicat_username} password=${pg_replicat_password}'\'' ' | sudo tee -a /data/pgsql/postgresql.conf"
@@ -49,6 +43,7 @@ if [[ $add_iscsi_volume == "true" ]]; then
     	sudo -u root bash -c "echo 'recovery_target_timeline = '\''latest'\'' ' | sudo tee -a /data/pgsql/recovery.conf"
     	sudo -u root bash -c "chown postgres /data/pgsql/recovery.conf"
 	fi
+	sed -i 's/^max_connections = [0-9]\+/max_connections = 200/' /data/pgsql/postgresql.conf
 	echo '-[100%]-> Files recovery.conf/postgresql.conf updated.'
 else 
 	echo '--> Taking initial backup of database...'
@@ -57,13 +52,7 @@ else
 	echo '-[100%]-> Initial backup of database taken.'	
 
 	echo '--> Updating content of recovery.conf/postgresql.conf files...'
-	if [[ $pg_version == "13" ]]; then 
-		touch /var/lib/pgsql/${pg_version}/data/standby.signal
-		touch /var/lib/pgsql/${pg_version}/data/recovery.signal
-		sudo -u root bash -c "echo 'primary_conninfo  = '\''host=${pg_master_ip} port=5432 user=${pg_replicat_username} password=${pg_replicat_password}'\'' ' | sudo tee -a /var/lib/pgsql/${pg_version}/data/postgresql.conf"
-    	sudo -u root bash -c "echo 'recovery_target_timeline = '\''latest'\'' ' | sudo tee -a /var/lib/pgsql/${pg_version}/data/postgresql.conf"
-    	sudo -u root bash -c "chown postgres /var/lib/pgsql/${pg_version}/data/postgresql.conf"
-	elif [[ $pg_version == "12"  ]]; then
+	if [[ $pg_version -ge "12" ]]; then 
 		touch /var/lib/pgsql/${pg_version}/data/standby.signal
 		touch /var/lib/pgsql/${pg_version}/data/recovery.signal
 		sudo -u root bash -c "echo 'primary_conninfo  = '\''host=${pg_master_ip} port=5432 user=${pg_replicat_username} password=${pg_replicat_password}'\'' ' | sudo tee -a /var/lib/pgsql/${pg_version}/data/postgresql.conf"
@@ -75,6 +64,7 @@ else
     	sudo -u root bash -c "echo 'recovery_target_timeline = '\''latest'\'' ' | sudo tee -a /var/lib/pgsql/${pg_version}/data/recovery.conf"
     	sudo -u root bash -c "chown postgres /var/lib/pgsql/${pg_version}/data/recovery.conf"
 	fi
+	sed -i 's/^max_connections = [0-9]\+/max_connections = 200/' /var/lib/pgsql/${pg_version}/data/recovery.conf
 	echo '-[100%]-> Files recovery.conf/postgresql.conf updated.'
 fi
 

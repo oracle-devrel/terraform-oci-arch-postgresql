@@ -20,7 +20,7 @@ data "template_cloudinit_config" "cloud_init" {
 }
 
 resource "oci_core_instance" "postgresql_master" {
-  availability_domain = var.availability_domain_name
+  availability_domain = local.get_ad
   compartment_id      = var.compartment_ocid
   display_name        = "PostgreSQL_Master"
   shape               = var.postgresql_instance_shape
@@ -46,7 +46,7 @@ resource "oci_core_instance" "postgresql_master" {
     }
   }
 
-  fault_domain = var.postgresql_master_fd
+  fault_domain = contains(["1", "2", "3"],tostring(var.postgresql_master_fd)) ? "FAULT-DOMAIN-${var.postgresql_master_fd}" : "FAULT-DOMAIN-1"
 
   create_vnic_details {
     subnet_id        = !var.use_existing_vcn ? oci_core_subnet.postgresql_subnet[0].id : var.postgresql_subnet
@@ -69,7 +69,7 @@ resource "oci_core_instance" "postgresql_master" {
     command = "sleep 240"
   }
 
-  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_boot_volume_backup" "postgresql_master_boot_volume_backup" {
@@ -87,7 +87,7 @@ resource "oci_core_volume_backup_policy_assignment" "postgresql_master_boot_volu
 
 resource "oci_core_instance" "postgresql_hotstandby1" {
   count               = var.postgresql_deploy_hotstandby1 ? 1 : 0
-  availability_domain = var.postgresql_hotstandby1_ad == "" ? var.availability_domain_name : var.postgresql_hotstandby1_ad
+  availability_domain = var.postgresql_hotstandby1_ad == "" ? local.get_ad : local.standby1_ad
   compartment_id      = var.compartment_ocid
   display_name        = "PostgreSQL_HotStandby1"
   shape               = var.postgresql_hotstandby1_shape
@@ -114,7 +114,7 @@ resource "oci_core_instance" "postgresql_hotstandby1" {
   }
 
 
-  fault_domain = var.postgresql_hotstandby1_fd
+  fault_domain = contains(["1", "2", "3"],tostring(var.postgresql_hotstandby1_fd)) ? "FAULT-DOMAIN-${var.postgresql_hotstandby1_fd}" : "FAULT-DOMAIN-2"
 
   create_vnic_details {
     subnet_id        = !var.use_existing_vcn ? oci_core_subnet.postgresql_subnet[0].id : var.postgresql_subnet
@@ -137,7 +137,7 @@ resource "oci_core_instance" "postgresql_hotstandby1" {
     command = "sleep 240"
   }
 
-  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_boot_volume_backup" "postgresql_hotstandby1_boot_volume_backup" {
@@ -155,7 +155,7 @@ resource "oci_core_volume_backup_policy_assignment" "postgresql_hotstandby1_boot
 
 resource "oci_core_instance" "postgresql_hotstandby2" {
   count               = var.postgresql_deploy_hotstandby2 ? 1 : 0
-  availability_domain = var.postgresql_hotstandby2_ad == "" ? var.availability_domain_name : var.postgresql_hotstandby2_ad
+  availability_domain = var.postgresql_hotstandby2_ad == "" ? local.get_ad : local.standby2_ad
   compartment_id      = var.compartment_ocid
   display_name        = "PostgreSQL_HotStandby2"
   shape               = var.postgresql_hotstandby2_shape
@@ -182,7 +182,7 @@ resource "oci_core_instance" "postgresql_hotstandby2" {
     }
   }
 
-  fault_domain = var.postgresql_hotstandby2_fd
+  fault_domain = contains(["1", "2", "3"],tostring(var.postgresql_hotstandby2_fd)) ? "FAULT-DOMAIN-${var.postgresql_hotstandby2_fd}" : "FAULT-DOMAIN-3"
 
   create_vnic_details {
     subnet_id        = !var.use_existing_vcn ? oci_core_subnet.postgresql_subnet[0].id : var.postgresql_subnet
@@ -205,7 +205,7 @@ resource "oci_core_instance" "postgresql_hotstandby2" {
     command = "sleep 240"
   }
 
-  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  #defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_boot_volume_backup" "postgresql_hotstandby2_boot_volume_backup" {

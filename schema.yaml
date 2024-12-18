@@ -14,19 +14,22 @@
       - tenancy_ocid
       - region
       - release
-      - use_existing_vcn
-      - postgresql_vcn
-      - postgresql_subnet
+      - fingerprint
+      - private_key_path
+      - user_ocid
       
     - title: Required Configuration  
       variables:
       - compartment_ocid
-      - availability_domain_name
+      - availability_domain_number
       - postgresql_version
       - postgresql_password
       - postgresql_deploy_hotstandby1
       - postgresql_deploy_hotstandby2
       - create_in_private_subnet
+      - use_existing_vcn
+      - postgresql_vcn
+      - postgresql_subnet
       - show_advanced
 
     - title: Network Optional Configuration
@@ -34,6 +37,7 @@
           and:
             - show_advanced
       variables:
+      - pg_whitelist_cidr
       - pg_whitelisted_ip 
       - postgresql_vcn_cidr
       - postgresql_subnet_cidr
@@ -92,7 +96,6 @@
       - postgresql_hotstandby2_flex_shape_memory
 
     variables:
-
       show_advanced:
         type: boolean
         title: "Show advanced options?"
@@ -110,19 +113,26 @@
         description: "Choose whitelisted IP in a public scenario (for example, 89.64.91.8). It will give you the ability to access the database from your laptop and PGAdmin tool."
         default: ""
 
+      pg_whitelist_cidr: 
+        type: string
+        required: false
+        title: "Whitelisted CIDR Block"
+        description: "Choose whitelisted Cidr Block to be added in the firewall-cmd in trusted zone. It will give you the ability to access the database from your laptop and PGAdmin tool."
+        default: ""
+
       postgresql_deploy_hotstandby1:
         type: boolean
         title: "Deploy first PostgreSQL HotStandby?"
         description: "Check the box to deploy first PostgreSQL HotStandby."
         visible: true
-        default: true
+        default: false
 
       postgresql_deploy_hotstandby2:
         type: boolean
         title: "Deploy second PostgreSQL HotStandby?"
         description: "Check the box to deploy second PostgreSQL HotStandby."
         visible: true
-        default: true
+        default: false
       
       compartment_ocid:
         type: oci:identity:compartment:id
@@ -138,12 +148,20 @@
         title: Region
         description: "Region where you want to deploy the resources defined by this stack."
 
-      availability_domain_name:
-        type: oci:identity:availabilitydomain:name
+      # availability_domain_number:
+      #   type: oci:identity:availabilitydomain:name
+      #   required: true
+      #   visible: true
+      #   title: "Availability Domain for master PostgreSQL"
+      #   description: "Availability Domain to be chosen for master PostgreSQL."
+      #   dependsOn:
+      #     compartmentId: ${compartment_ocid}
+      availability_domain_number:
+        type: string
         required: true
         visible: true
-        title: "Availability Domain for master PostgreSQL"
-        description: "Availability Domain to be chosen for master PostgreSQL."
+        title: "Availability Domain number for Postgresql"
+        default: "1"
         dependsOn:
           compartmentId: ${compartment_ocid}
 
@@ -176,6 +194,7 @@
           - "11"
           - "10"          
           - "9.6" 
+          - "14"
 
       create_in_private_subnet:
         type: boolean
@@ -271,7 +290,9 @@
 
       postgresql_vcn_cidr:
         type: string
-        visible: true
+        visible:
+          not:
+            - use_existing_vcn
         required: false
         pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
         title: "VCN CIDR"
@@ -280,7 +301,9 @@
 
       postgresql_subnet_cidr:
         type: string
-        visible: true
+        visible:
+          not:
+            - use_existing_vcn
         required: false
         pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
         title: "VCN CIDR"
@@ -290,12 +313,12 @@
       create_drg_for_private_subnet:
         type: boolean
         visible: 
-          and:
-            - create_in_private_subnet
+          not:
+            - use_existing_vcn
         required: false
         title: "Create DRG for Private Subnet scenario"
         description: "Providing an option to create Dynamic Routing Gateway (DRG) for VCN and afterwards you can connect to your private subnet from on-premise."
-        default: true        
+        default: false        
 
       postgresql_instance_shape:
         type: oci:core:instanceshape:name
@@ -372,6 +395,7 @@
         description: "An Operating System version that determines the operating system version for the instance."
         default: "8"
         enum: 
+          - "7.9"
           - "8"
 
       postgresql_master_fd:
@@ -379,11 +403,11 @@
         required: false
         title: "PostgreSQL Master Fault Domain"
         description: "Choose Fault Domain for PostgreSQL Master."
-        default: "FAULT-DOMAIN-1"
+        default: "1"
         enum:
-          - "FAULT-DOMAIN-1"
-          - "FAULT-DOMAIN-2"  
-          - "FAULT-DOMAIN-3"
+          - "1"
+          - "2"  
+          - "3"
 
       postgresql_replicat_username:
         type: string
@@ -391,24 +415,33 @@
         title: "PostgreSQL Replicat Username"
         description: "Type PostgreSQL Replicat Username"
 
+      # postgresql_hotstandby1_ad:
+      #   type: oci:identity:availabilitydomain:name
+      #   required: false
+      #   title: "AD for the first PostgreSQL HotStandby"
+      #   description: "Availability Domain for the first PostgreSQL HotStandby."
+      #   dependsOn:
+      #     compartmentId: ${compartment_ocid}
       postgresql_hotstandby1_ad:
-        type: oci:identity:availabilitydomain:name
+        type: string
         required: false
-        title: "AD for the first PostgreSQL HotStandby"
+        title: "AD number for the first PostgreSQL HotStandby"
         description: "Availability Domain for the first PostgreSQL HotStandby."
         dependsOn:
           compartmentId: ${compartment_ocid}
+
+
 
       postgresql_hotstandby1_fd:
         type: enum
         required: false
         title: "The first PostgreSQL HotStandby's Fault Domain"
         description: "Choose Fault Domain for the first PostgreSQL HotStandby."
-        default: "FAULT-DOMAIN-2"
+        default: "2"
         enum:
-          - "FAULT-DOMAIN-1"
-          - "FAULT-DOMAIN-2"  
-          - "FAULT-DOMAIN-3"
+          - "1"
+          - "2"  
+          - "3"
 
       postgresql_hotstandby1_shape:
         type: oci:core:instanceshape:name
@@ -469,24 +502,33 @@
                 - postgresql_hotstandby1_shape
                 - "VM.Standard3.Flex"
 
+      # postgresql_hotstandby2_ad:
+      #   type: oci:identity:availabilitydomain:name
+      #   required: false
+      #   title: "AD for the second PostgreSQL HotStandby"
+      #   description: "Availability Domain for the second PostgreSQL HotStandby."
+      #   dependsOn:
+      #     compartmentId: ${compartment_ocid}
+
       postgresql_hotstandby2_ad:
-        type: oci:identity:availabilitydomain:name
+        type: string
         required: false
-        title: "AD for the second PostgreSQL HotStandby"
+        title: "AD number for the second PostgreSQL HotStandby"
         description: "Availability Domain for the second PostgreSQL HotStandby."
         dependsOn:
           compartmentId: ${compartment_ocid}
+
 
       postgresql_hotstandby2_fd:
         type: enum
         required: false
         title: "The second PostgreSQL HotStandby's Fault Domain"
         description: "Choose Fault Domain for the second PostgreSQL HotStandby."
-        default: "FAULT-DOMAIN-3"
+        default: "3"
         enum:
-          - "FAULT-DOMAIN-1"
-          - "FAULT-DOMAIN-2"  
-          - "FAULT-DOMAIN-3"
+          - "1"
+          - "2"  
+          - "3"
 
       postgresql_hotstandby2_shape:
         type: oci:core:instanceshape:name
@@ -546,6 +588,31 @@
               - eq:
                 - postgresql_hotstandby2_shape
                 - "VM.Standard3.Flex"
+      use_existing_vcn:
+        type: boolean
+        title: "Use Existing VCN"
+        description: "Click to use existing VCN, otherwise VCN and Subnets will be created"
+        required: true
+        default: false
+
+      postgresql_vcn:
+        type: oci:core:vcn:id
+        title: "Existing VCN"
+        description: "Select Existing VCN"
+        dependsOn:
+          compartmentId: compartment_ocid
+        visible: use_existing_vcn
+        required: true
+
+      postgresql_subnet:
+        type: oci:core:subnet:id
+        title: "Postgresql_subnet"
+        description: "Select Subnet for Postgresql Instances and Bastion service"
+        dependsOn:
+          compartmentId: compartment_ocid
+          vcnId: postgresql_vcn
+        visible: use_existing_vcn
+        required: true
 
     outputs:
 
@@ -578,4 +645,5 @@
         displayText: "PostgreSQL Username"
         type: string
         visible: true
+
 
